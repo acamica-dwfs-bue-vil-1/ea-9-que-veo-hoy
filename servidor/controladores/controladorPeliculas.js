@@ -24,8 +24,8 @@ function buscarPeliculas (req, res) {
     sql += ` WHERE titulo LIKE \'\%${titulo}\%\' AND genero_id = ${genero}`;
     console.log('género y título: ' + sql);
   } else if (!genero && anio && titulo) {
-    sql += ` WHERE titulo LIKE \'\%${titulo}\%\' AND anio = ${anio}`;
-    console.log('año y título: ' + sql);
+    sql += ` WHERE titulo LIKE \'\%${titulo}\%\' AND anio =  ${anio}`;
+    console.log('año y título: ' + sql);  
   } else if (titulo) {
       sql += ` WHERE titulo LIKE \'\%${titulo}\%\'`;
       console.log('sólo título: ' + sql);
@@ -96,7 +96,38 @@ function buscarGeneros (req, res) {
   });
 }
 
+function buscarInfoPelicula (req, res) {
+    let id = req.params.id;
+    // let sql = `SELECT * FROM pelicula WHERE id = ${id}`;
+    let sql = `SELECT * FROM pelicula INNER JOIN genero ON genero_id = genero.id WHERE pelicula.id = ${id}`
+    console.log(`id de película: ${id}`);
+
+    connection.query(sql, function(error, resultado, fields) {
+      if (error) {
+          console.log("Hubo un error en la consulta", error.message);
+          return res.status(404).send("Hubo un error en la consulta");
+      } 
+      console.log(resultado);
+      console.log('genero ' + resultado[0].nombre)
+      sql = `SELECT * FROM actor_pelicula INNER JOIN actor ON actor_id = actor.id WHERE pelicula_id = ${id}`
+      connection.query(sql, function(error_, resultado_, fields_) {
+        if (error) {
+            console.log("Hubo un error en la consulta", error.message);
+            return res.status(404).send("Hubo un error en la consulta");
+        } 
+        var response = {
+            'pelicula': resultado[0],
+            'genero': resultado[0].nombre,
+            'actores': resultado_         
+        };
+    
+        res.send(JSON.stringify(response));
+      }); 
+    });
+}
+
 module.exports = {
   buscarPeliculas: buscarPeliculas,
-  buscarGeneros: buscarGeneros
+  buscarGeneros: buscarGeneros,
+  buscarInfoPelicula: buscarInfoPelicula
 };
