@@ -137,10 +137,11 @@ function recomendarPelicula (req, res) {
   let anio_fin = req.query.anio_fin;
   let puntuacion = req.query.puntuacion;
   let sql = `SELECT * FROM pelicula`;
+  let sqlConGenero = `SELECT pelicula.id, pelicula.poster, pelicula.trama FROM pelicula`;
   let generos;
 
   let parametros = [
-    {'nombre': 'genero', 'valor': genero, 'query': ` INNER JOIN genero ON genero_id = genero.id WHERE genero.nombre = \'${genero}\'`},
+    {'nombre': 'genero', 'valor': genero, 'query': ` INNER JOIN genero ON pelicula.genero_id = genero.id WHERE genero.nombre = \'${genero}\'`},
     {'nombre': 'anio_inicio', 'valor': anio_inicio, 'query': ` AND pelicula.anio BETWEEN ${anio_inicio}`, 'querySinGenero': ` WHERE anio BETWEEN ${anio_inicio}`}, 
     {'nombre': 'anio_fin', 'valor':anio_fin, 'query': ` AND ${anio_fin}`, 'querySinGenero': ` AND ${anio_fin}`}, 
     {'nombre': 'puntuacion', 'valor': puntuacion, 'query': ` AND pelicula.puntuacion = ${puntuacion}`, 'querySinGenero': ` AND puntuacion = ${puntuacion}`}
@@ -150,8 +151,11 @@ function recomendarPelicula (req, res) {
   parametros.forEach(e => {
     if (genero) {
       if (e.valor !== "" && e.valor !== undefined) {
-        sql += e.query;
+        sqlConGenero += e.query;
+        sql = sqlConGenero;
       }
+    }else if (puntuacion && !anio_inicio && !anio_fin) {
+      sql = `SELECT * FROM pelicula WHERE puntuacion = ${puntuacion}`;
     }else{
       if (e.valor !== "" && e.valor !== undefined) {
         sql += e.querySinGenero;
@@ -170,7 +174,7 @@ function recomendarPelicula (req, res) {
         console.log("Hubo un error en la consulta", error.message);
         return res.status(404).send("Hubo un error en la consulta");
     } 
-    console.log(resultado);         
+    // console.log(resultado);         
     var response = {
       'peliculas': resultado
     };
