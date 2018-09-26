@@ -97,37 +97,91 @@ function buscarGeneros (req, res) {
 }
 
 function buscarInfoPelicula (req, res) {
-    let id = req.params.id;
-    // let sql = `SELECT * FROM pelicula WHERE id = ${id}`;
-    let sql = `SELECT * FROM pelicula INNER JOIN genero ON genero_id = genero.id WHERE pelicula.id = ${id}`
-    console.log(`id de película: ${id}`);
+    if (req.params.id !== 'recomendacion') {
+      let id = req.params.id;      
+    
 
-    connection.query(sql, function(error, resultado, fields) {
-      if (error) {
-          console.log("Hubo un error en la consulta", error.message);
-          return res.status(404).send("Hubo un error en la consulta");
-      } 
-      console.log(resultado);
-      console.log('genero ' + resultado[0].nombre)
-      sql = `SELECT * FROM actor_pelicula INNER JOIN actor ON actor_id = actor.id WHERE pelicula_id = ${id}`
-      connection.query(sql, function(error_, resultado_, fields_) {
+      // let sql = `SELECT * FROM pelicula WHERE id = ${id}`;
+      let sql = `SELECT * FROM pelicula INNER JOIN genero ON genero_id = genero.id WHERE pelicula.id = ${id}`
+      console.log(`id de película: ${id}`);
+
+      connection.query(sql, function(error, resultado, fields) {
         if (error) {
             console.log("Hubo un error en la consulta", error.message);
             return res.status(404).send("Hubo un error en la consulta");
         } 
-        var response = {
-            'pelicula': resultado[0],
-            'genero': resultado[0].nombre,
-            'actores': resultado_         
-        };
-    
-        res.send(JSON.stringify(response));
-      }); 
-    });
+        console.log(resultado);
+        console.log('genero ' + resultado[0].nombre)
+        sql = `SELECT * FROM actor_pelicula INNER JOIN actor ON actor_id = actor.id WHERE pelicula_id = ${id}`
+        connection.query(sql, function(error_, resultado_, fields_) {
+          if (error) {
+              console.log("Hubo un error en la consulta", error.message);
+              return res.status(404).send("Hubo un error en la consulta");
+          } 
+          var response = {
+              'pelicula': resultado[0],
+              'genero': resultado[0].nombre,
+              'actores': resultado_         
+          };
+      
+          res.send(JSON.stringify(response));
+        }); 
+      });
+  }
+}
+
+function recomendarPelicula (req, res) {
+  console.log(req.query);   
+  let genero = req.query.genero;  
+  let anio_inicio = req.query.anio_inicio;
+  let anio_fin = req.query.anio_fin;
+  let puntuacion = req.query.puntuacion;
+  let sql = `SELECT * FROM pelicula`;
+  let generos;
+
+  let parametros = [
+    {'nombre': 'genero', 'valor': genero, 'query': ` INNER JOIN genero ON genero_id = genero.id WHERE genero.nombre = \'${genero}\'`},
+    {'nombre': 'anio_inicio', 'valor': anio_inicio, 'query': ` AND pelicula.anio BETWEEN ${anio_inicio}`, 'querySinGenero': ` WHERE anio BETWEEN ${anio_inicio}`}, 
+    {'nombre': 'anio_fin', 'valor':anio_fin, 'query': ` AND ${anio_fin}`, 'querySinGenero': ` AND ${anio_fin}`}, 
+    {'nombre': 'puntuacion', 'valor': puntuacion, 'query': ` AND pelicula.puntuacion = ${puntuacion}`, 'querySinGenero': ` AND puntuacion = ${puntuacion}`}
+  ];
+  console.log('parametros: ' + parametros);
+  
+  parametros.forEach(e => {
+    if (genero) {
+      if (e.valor !== "" && e.valor !== undefined) {
+        sql += e.query;
+      }
+    }else{
+      if (e.valor !== "" && e.valor !== undefined) {
+        sql += e.querySinGenero;
+      }
+    }
+  });
+  console.log(sql);
+  // let sql = `SELECT * FROM pelicula WHERE anio BETWEEN ${anio_inicio} AND ${anio_fin} AND puntuacion = ${puntuacion}`;      
+  // if (genero || anio_inicio || anio_fin || puntuacion) {
+  // console.log(req.query);       
+  //   console.log('va bien'); 
+  // }
+
+  connection.query(sql, function(error, resultado, fields) {
+    if (error) {
+        console.log("Hubo un error en la consulta", error.message);
+        return res.status(404).send("Hubo un error en la consulta");
+    } 
+    console.log(resultado);         
+    var response = {
+      'peliculas': resultado
+    };
+
+    res.send(JSON.stringify(response));
+  });
 }
 
 module.exports = {
   buscarPeliculas: buscarPeliculas,
   buscarGeneros: buscarGeneros,
-  buscarInfoPelicula: buscarInfoPelicula
+  buscarInfoPelicula: buscarInfoPelicula,
+  recomendarPelicula: recomendarPelicula
 };
