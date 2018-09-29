@@ -15,8 +15,6 @@
                 pelicula = data.pelicula;
                 actores = data.actores;
                 genero = data.genero;
-                // genero = data.pelicula.nombre;
-                console.log('data:', data);
 
                 $(".imagen").attr("src", pelicula.poster);
                 $(".titulo, title").html(pelicula.titulo + " (" + pelicula.anio + ")");

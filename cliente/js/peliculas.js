@@ -5,7 +5,6 @@ $(document).ready(function() {
     $.getJSON(servidor + "/generos",
         function(data) {
             for (i = 0; i < data.generos.length; i++) {
-                console.log(data.generos);
                 //se duplica una opcion de la lista de selección
                 var opcion = $(".genero-select option[value='0']").clone();
                 //a esa opcion se le asigna como valor el id del genero, dato que luego va a servir para filtrar por id de genero.

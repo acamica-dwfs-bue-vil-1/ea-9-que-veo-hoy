@@ -66,7 +66,6 @@ function buscarPeliculas (req, res) {
         return res.status(404).send("Hubo un error en la consulta");       
       }
       total = resultado_.length;
-      console.log(`sql_ = ${sql_}`);
       console.log(total);
 
       var response = {
@@ -74,9 +73,7 @@ function buscarPeliculas (req, res) {
         'total': total
       };
 
-      res.send(JSON.stringify(response));
-      console.log(sql);
-      console.log(total);    
+      res.send(JSON.stringify(response));   
     });
 
   });
@@ -113,8 +110,6 @@ function buscarInfoPelicula (req, res) {
             console.log("Hubo un error en la consulta", error.message);
             return res.status(404).send("Hubo un error en la consulta");
         } 
-        console.log(resultado);
-        console.log('genero ' + resultado[0].nombre)
         sql = `SELECT * FROM actor_pelicula INNER JOIN actor ON actor_id = actor.id WHERE pelicula_id = ${id}`
         connection.query(sql, function(error_, resultado_, fields_) {
           if (error) {
@@ -166,18 +161,12 @@ function recomendarPelicula (req, res) {
     }
   });
   console.log(sql);
-  // let sql = `SELECT * FROM pelicula WHERE anio BETWEEN ${anio_inicio} AND ${anio_fin} AND puntuacion = ${puntuacion}`;      
-  // if (genero || anio_inicio || anio_fin || puntuacion) {
-  // console.log(req.query);       
-  //   console.log('va bien'); 
-  // }
 
   connection.query(sql, function(error, resultado, fields) {
     if (error) {
         console.log("Hubo un error en la consulta", error.message);
         return res.status(404).send("Hubo un error en la consulta");
     } 
-    // console.log(resultado);         
     var response = {
       'peliculas': resultado
     };
