@@ -144,7 +144,6 @@ function recomendarPelicula (req, res) {
     {'nombre': 'anio_fin', 'valor':anio_fin, 'query': ` AND ${anio_fin}`, 'querySinGenero': ` AND ${anio_fin}`}, 
     {'nombre': 'puntuacion', 'valor': puntuacion, 'query': ` AND pelicula.puntuacion = ${puntuacion}`, 'querySinGenero': ` AND puntuacion = ${puntuacion}`}
   ];
-  console.log('parametros: ' + parametros);
   
   parametros.forEach(e => {
     if (genero) {
