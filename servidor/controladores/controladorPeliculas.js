@@ -39,10 +39,13 @@ function buscarPeliculas (req, res) {
 
 //FILTROS POR ORDEN
   if (orden === 'anio') {
-    sql += ` ORDER BY anio ${tipoOrden}`;    
+    sql += ` ORDER BY fecha_lanzamiento ${tipoOrden}`;    
     console.log(sql);
   } else if (orden === 'puntuacion') {
     sql += ` ORDER BY puntuacion ${tipoOrden}`;    
+    console.log(sql);
+  } else if (orden === 'duracion') {
+    sql += ` ORDER BY duracion ${tipoOrden}`;    
     console.log(sql);
   }
   sql_ = sql;      

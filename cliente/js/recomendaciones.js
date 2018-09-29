@@ -13,6 +13,7 @@ function ControladorRecomendaciones() {
     this.resultados;
     this.puntuacion;
     this.pelicula_actual;
+    let genero_ ;
     //esta funcion crea y les da funcionalidad a los botones (que contienen las distintas respuestas a las pregunas).
     this.inicializarPreguntas = function() {
         var self = this;
@@ -49,11 +50,13 @@ function ControladorRecomendaciones() {
 
         $(".paso-2-links .pregunta").click(function() {
             self.genero = $(this).attr("genero");
+            genero_ = self.genero;                        
             self.pedirRecomendacion();
         });
 
         $('.paso-2 select').change(function() {
             self.genero = $(this).children("option:checked").attr("genero");
+            genero_ = self.genero;            
             self.pedirRecomendacion();
         });
 
@@ -152,7 +155,6 @@ function ControladorRecomendaciones() {
 
     //esta funcion recibe una pelicula y se encarga de mostrarla
     this.mostrarPelicula = function(data) {
-        let genero_ = $('.paso-2 select').children("option:checked").attr("genero");
         $(".pregunta").hide();
         $(".header-title h1").addClass('small');
         $(".datos-pelicula").show();
